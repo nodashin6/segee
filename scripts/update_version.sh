@@ -19,8 +19,8 @@ if [[ ! $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
-# 現在のバージョンを取得
-CURRENT_VERSION=$(grep 'version = ' pyproject.toml | cut -d'"' -f2)
+# 現在のバージョンを取得（project セクションのバージョンのみ）
+CURRENT_VERSION=$(grep -A 10 '\[project\]' pyproject.toml | grep 'version = ' | head -1 | cut -d'"' -f2)
 
 echo "📋 バージョン更新"
 echo "現在: $CURRENT_VERSION"
@@ -34,8 +34,8 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# pyproject.toml のバージョンを更新
-sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+# pyproject.toml のバージョンを更新（[project]セクション内のみ）
+sed -i "/^\[project\]/,/^\[/ s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
 
 echo "✅ バージョンを $NEW_VERSION に更新しました"
 echo ""
