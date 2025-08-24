@@ -3,19 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
-from typing import Generic, overload
+from typing import overload
 
-from ..exceptions import (
+from segee._types import BinaryOperation, Predicate, T
+from segee.exceptions import (
     SegmentTreeIndexError,
     SegmentTreeInitializationError,
     SegmentTreeRangeError,
 )
-from .._types import BinaryOperation, Predicate, T
 
 __all__ = ["SegmentTree"]
 
 
-class SegmentTree(Sequence[T], Generic[T]):
+class SegmentTree[T](Sequence[T]):
     """A high-performance Segment Tree data structure for range queries and updates.
 
     The Segment Tree supports efficient range aggregation queries and point updates
@@ -91,6 +91,11 @@ class SegmentTree(Sequence[T], Generic[T]):
 
         # Initialize the internal array with identity elements
         self._data: list[T] = [self._identity] * self._total_size
+
+    def __hash__(self) -> int:
+        """Segment trees are mutable and should not be hashed."""
+        msg = "unhashable type: 'SegmentTree'"
+        raise TypeError(msg)
 
     @property
     def size(self) -> int:

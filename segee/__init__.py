@@ -25,14 +25,14 @@ Examples:
 
 from __future__ import annotations
 
+from ._types import BinaryOperation, Predicate, SupportsComparison, T
 from .exceptions import (
     SegmentTreeError,
     SegmentTreeIndexError,
     SegmentTreeInitializationError,
     SegmentTreeRangeError,
 )
-from .segment_tree import SegmentTree, MaxSegmentTree, MinSegmentTree, SumSegmentTree
-from ._types import BinaryOperation, Predicate, SupportsComparison, T
+from .segment_tree import MaxSegmentTree, MinSegmentTree, SegmentTree, SumSegmentTree
 
 __version__ = "0.1.0"
 __author__ = "nodashin"

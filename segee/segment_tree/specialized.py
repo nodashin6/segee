@@ -6,7 +6,7 @@ import operator
 
 from .segment_tree import SegmentTree
 
-__all__ = ["MinSegmentTree", "MaxSegmentTree", "SumSegmentTree"]
+__all__ = ["MaxSegmentTree", "MinSegmentTree", "SumSegmentTree"]
 
 
 class SumSegmentTree(SegmentTree[int | float]):
