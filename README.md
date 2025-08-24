@@ -2,8 +2,6 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-152%20passed-brightgreen.svg)](tests/)
-[![Type Safety](https://img.shields.io/badge/type%20safety-100%25-blue.svg)](segee/)
 
 
 Lightning-fast range queries with O(log n) performance and modern Python design.
@@ -63,13 +61,6 @@ segee/
 - **[API Reference](docs/api.md)** - Complete method documentation  
 - **[Performance](docs/performance.md)** - Benchmarks and complexity analysis
 - **[Contributing](docs/contributing.md)** - Development setup and guidelines
-
-## 🎯 Perfect For
-
-- 🏆 **Competitive Programming** - Range query problems (AtCoder, Codeforces)
-- 📊 **Data Analysis** - Fast aggregations over sliding windows
-- 🎮 **Game Development** - Collision detection and spatial queries
-- 💰 **Financial Computing** - Risk calculations and portfolio analytics
 
 
 
