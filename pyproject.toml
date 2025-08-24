@@ -48,10 +48,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/nodashin/ndsn-segment-tree"
-Documentation = "https://ndsn-segment-tree.readthedocs.io"
-Repository = "https://github.com/nodashin/ndsn-segment-tree.git"
-Issues = "https://github.com/nodashin/ndsn-segment-tree/issues"
+Homepage = "https://github.com/nodashin6/segee"
+Documentation = "https://github.com/nodashin6/segee/blob/main/docs/usage.md"
+Repository = "https://github.com/nodashin6/segee.git"
+Issues = "https://github.com/nodashin6/segee/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["segee"]
@@ -194,4 +194,9 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=6.2.1",
 ]

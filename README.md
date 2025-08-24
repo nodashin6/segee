@@ -83,6 +83,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Built with ❤️ for the Python community**
 
-[🐛 Report Bug](https://github.com/nodashin/ndsn-segment-tree/issues) • [✨ Request Feature](https://github.com/nodashin/ndsn-segment-tree/issues) • [📖 Documentation](docs/)
+[🐛 Report Bug](https://github.com/nodashin/segee/issues) • [✨ Request Feature](https://github.com/nodashin/segee/issues) • [📖 Documentation](docs/)
 
 </div>

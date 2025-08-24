@@ -199,7 +199,7 @@ result = np.sum(arr[left:right])  # Vectorized, very fast
 |---------|-------------|--------------|
 | **Range Query** | O(log n) | O(log n) |
 | **Point Update** | O(log n) | O(log n) |
-| **Memory** | 4n | 2n |
+| **Memory** | 2n | n |
 | **Operations** | Any associative | Sum-like only |
 | **Implementation** | More complex | Simpler |
 | **Range Update** | Need lazy prop | Not supported |
