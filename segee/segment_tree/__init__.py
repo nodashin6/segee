@@ -6,8 +6,8 @@ from .segment_tree import SegmentTree
 from .specialized import MaxSegmentTree, MinSegmentTree, SumSegmentTree
 
 __all__ = [
-    "SegmentTree",
-    "MaxSegmentTree", 
+    "MaxSegmentTree",
     "MinSegmentTree",
+    "SegmentTree",
     "SumSegmentTree",
 ]

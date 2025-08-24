@@ -130,6 +130,7 @@ ignore = [
     "D107", # Missing docstring in __init__
     "COM812", # Trailing comma missing
     "ISC001", # Implicitly concatenated string literals on one line
+    "TC001", # Move application import into a type-checking block
 ]
 
 [tool.ruff.lint.pydocstyle]
