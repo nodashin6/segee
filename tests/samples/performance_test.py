@@ -104,12 +104,16 @@ class TestPerformanceComparison:
         print(f"  Naive:        {naive_time:.4f}s")
         print(f"  Speedup:      {speedup:.2f}x")
         
-        # For small sizes, performance should be comparable
-        # Segment tree might be slightly slower due to overhead
-        if n <= 1000 and q <= 1000:
-            # Allow segment tree to be up to 5x slower for small inputs
-            assert segment_time < naive_time * 5.0, \
-                f"Segment tree too slow: {segment_time:.4f}s vs {naive_time:.4f}s"
+        # For small sizes, segment tree might have initialization overhead
+        # But for larger sizes, it should show advantage
+        if n >= 1000 and q >= 1000:
+            # Segment tree should be faster than naive, even if just slightly
+            assert segment_time < naive_time, \
+                f"Segment tree should be faster: {segment_time:.4f}s vs {naive_time:.4f}s"
+        else:
+            # For small inputs, just verify both complete successfully
+            assert segment_time > 0, "Segment tree should complete in measurable time"
+            assert naive_time > 0, "Naive method should complete in measurable time"
 
     @pytest.mark.parametrize("n,q", [(100, 100), (500, 500), (1000, 1000)])
     def test_min_query_performance(self, n: int, q: int) -> None:
@@ -139,12 +143,16 @@ class TestPerformanceComparison:
         print(f"  Naive:        {naive_time:.4f}s")
         print(f"  Speedup:      {speedup:.2f}x")
         
-        # For small sizes, performance should be comparable
-        # Segment tree might be slightly slower due to overhead
-        if n <= 1000 and q <= 1000:
-            # Allow segment tree to be up to 5x slower for small inputs
-            assert segment_time < naive_time * 5.0, \
-                f"Segment tree too slow: {segment_time:.4f}s vs {naive_time:.4f}s"
+        # For small sizes, segment tree might have initialization overhead
+        # But for larger sizes, it should show advantage
+        if n >= 1000 and q >= 1000:
+            # Segment tree should be faster than naive, even if just slightly
+            assert segment_time < naive_time, \
+                f"Segment tree should be faster: {segment_time:.4f}s vs {naive_time:.4f}s"
+        else:
+            # For small inputs, just verify both complete successfully
+            assert segment_time > 0, "Segment tree should complete in measurable time"
+            assert naive_time > 0, "Naive method should complete in measurable time"
 
     def test_scalability_demonstration(self) -> None:
         """Demonstrate scalability advantage of segment tree for larger inputs."""
@@ -175,11 +183,10 @@ class TestPerformanceComparison:
             print(f"  Naive:        {naive_time:.4f}s")
             print(f"  Speedup:      {speedup:.2f}x")
             
-            # For larger inputs, segment tree should start showing advantage
-            if n >= 2000 and q >= 3000:
-                # Segment tree should be faster or at least not much slower
-                assert segment_time < naive_time * 2.0, \
-                    f"Segment tree not scaling well: {segment_time:.4f}s vs {naive_time:.4f}s"
+            # For larger inputs, segment tree should definitely show advantage
+            # Even a slight advantage is sufficient
+            assert segment_time < naive_time, \
+                f"Segment tree should be faster for large inputs: {segment_time:.4f}s vs {naive_time:.4f}s"
 
 
 if __name__ == "__main__":
