@@ -10,8 +10,8 @@ Thank you for your interest in contributing to Segee! This guide will help you g
 
 ### Clone and Setup
 ```bash
-git clone https://github.com/nodashin/ndsn-segment-tree.git
-cd ndsn-segment-tree
+git clone https://github.com/nodashin/segee.git
+cd segee
 pip install -e ".[dev]"
 ```
 

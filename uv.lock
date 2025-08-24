@@ -505,6 +505,11 @@ test = [
     { name = "pytest-cov" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pytest-cov" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
@@ -518,6 +523,9 @@ requires-dist = [
     { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=1.2.0" },
 ]
 provides-extras = ["dev", "test", "docs"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest-cov", specifier = ">=6.2.1" }]
 
 [[package]]
 name = "snowballstemmer"
