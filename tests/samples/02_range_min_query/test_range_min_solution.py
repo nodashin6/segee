@@ -5,8 +5,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
-
 # Add the sample directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -182,7 +180,7 @@ class TestGroundTruthComparison:
 1 2 3
 2 0 3
 2 1 5"""
-        
+
         segment_result = solve(input_data)
         naive_result = solve_min_naive(input_data)
         assert segment_result == naive_result
@@ -203,7 +201,7 @@ class TestGroundTruthComparison:
 2 0 8
 2 4 6
 2 1 5"""
-        
+
         segment_result = solve(input_data)
         naive_result = solve_min_naive(input_data)
         assert segment_result == naive_result
@@ -216,7 +214,7 @@ class TestGroundTruthComparison:
 2 0 1
 1 0 100
 2 0 1"""
-        
+
         segment_result = solve(input_data)
         naive_result = solve_min_naive(input_data)
         assert segment_result == naive_result
@@ -232,7 +230,7 @@ class TestGroundTruthComparison:
 1 4 -5
 2 3 6
 2 0 6"""
-        
+
         segment_result = solve(input_data)
         naive_result = solve_min_naive(input_data)
         assert segment_result == naive_result

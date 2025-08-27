@@ -12,7 +12,7 @@ from segee.exceptions import (
     SegmentTreeInitializationError,
     SegmentTreeRangeError,
 )
-from segee.segment_tree import SegmentTree
+from segee.segment_tree import GenericSegmentTree
 
 
 class TestSegmentTreeInitialization:
@@ -20,29 +20,29 @@ class TestSegmentTreeInitialization:
 
     def test_valid_initialization(self) -> None:
         """Test valid initialization parameters."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         assert tree.size == 5
 
     def test_initialization_with_custom_identity_and_operation(self) -> None:
         """Test initialization with custom identity and operation."""
-        tree = SegmentTree(10, float("inf"), min)
+        tree = GenericSegmentTree(10, float("inf"), min)
         assert tree.size == 10
         assert tree.all_prod() == float("inf")
 
     def test_invalid_size_zero(self) -> None:
         """Test initialization with zero size raises error."""
         with pytest.raises(SegmentTreeInitializationError, match="Size must be positive"):
-            SegmentTree(0, 0, operator.add)
+            GenericSegmentTree(0, 0, operator.add)
 
     def test_invalid_size_negative(self) -> None:
         """Test initialization with negative size raises error."""
         with pytest.raises(SegmentTreeInitializationError, match="Size must be positive"):
-            SegmentTree(-5, 0, operator.add)
+            GenericSegmentTree(-5, 0, operator.add)
 
     def test_invalid_operation_not_callable(self) -> None:
         """Test initialization with non-callable operation raises error."""
         with pytest.raises(SegmentTreeInitializationError, match="Operation must be callable"):
-            SegmentTree(5, 0, "not_callable")  # type: ignore[arg-type]
+            GenericSegmentTree(5, 0, "not_callable")  # type: ignore[arg-type]
 
 
 class TestSegmentTreeBasicOperations:
@@ -50,13 +50,13 @@ class TestSegmentTreeBasicOperations:
 
     def test_set_and_get_single_element(self) -> None:
         """Test setting and getting a single element."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(0, 42)
         assert tree.get(0) == 42
 
     def test_set_and_get_multiple_elements(self) -> None:
         """Test setting and getting multiple elements."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [10, 20, 30, 40, 50]
 
         for i, value in enumerate(values):
@@ -67,25 +67,25 @@ class TestSegmentTreeBasicOperations:
 
     def test_get_invalid_index_positive(self) -> None:
         """Test getting element at invalid positive index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeIndexError):
             tree.get(5)
 
     def test_get_invalid_index_negative(self) -> None:
         """Test getting element at invalid negative index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeIndexError):
             tree.get(-6)
 
     def test_set_invalid_index(self) -> None:
         """Test setting element at invalid index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeIndexError):
             tree.set(5, 42)
 
     def test_negative_indexing(self) -> None:
         """Test negative indexing works correctly."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(-1, 99)  # Last element
         assert tree.get(-1) == 99
         assert tree.get(4) == 99
@@ -96,7 +96,7 @@ class TestSegmentTreeRangeQueries:
 
     def test_prod_sum_operation(self) -> None:
         """Test range product with sum operation."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 2, 3, 4, 5]
 
         for i, value in enumerate(values):
@@ -109,7 +109,7 @@ class TestSegmentTreeRangeQueries:
 
     def test_prod_max_operation(self) -> None:
         """Test range product with max operation."""
-        tree = SegmentTree(5, float("-inf"), max)
+        tree = GenericSegmentTree(5, float("-inf"), max)
         values = [10, 5, 20, 15, 8]
 
         for i, value in enumerate(values):
@@ -121,18 +121,18 @@ class TestSegmentTreeRangeQueries:
 
     def test_prod_empty_range(self) -> None:
         """Test range product with empty range returns identity."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         assert tree.prod(2, 2) == 0
 
     def test_prod_single_element_range(self) -> None:
         """Test range product with single element."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(2, 42)
         assert tree.prod(2, 3) == 42
 
     def test_prod_default_parameters(self) -> None:
         """Test range product with default parameters covers entire range."""
-        tree = SegmentTree(3, 0, operator.add)
+        tree = GenericSegmentTree(3, 0, operator.add)
         tree.set(0, 1)
         tree.set(1, 2)
         tree.set(2, 3)
@@ -140,30 +140,30 @@ class TestSegmentTreeRangeQueries:
 
     def test_prod_invalid_range_left_negative(self) -> None:
         """Test range product with invalid negative left bound."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeRangeError):
             tree.prod(-1, 3)
 
     def test_prod_invalid_range_right_too_large(self) -> None:
         """Test range product with invalid right bound."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeRangeError):
             tree.prod(0, 6)
 
     def test_prod_invalid_range_left_greater_than_right(self) -> None:
         """Test range product with left > right."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeRangeError):
             tree.prod(3, 1)
 
     def test_all_prod_empty_tree(self) -> None:
         """Test all_prod on tree with no elements set returns identity."""
-        tree = SegmentTree(5, 42, operator.add)
+        tree = GenericSegmentTree(5, 42, operator.add)
         assert tree.all_prod() == 42
 
     def test_all_prod_with_elements(self) -> None:
         """Test all_prod with elements set."""
-        tree = SegmentTree(3, 1, operator.mul)
+        tree = GenericSegmentTree(3, 1, operator.mul)
         tree.set(0, 2)
         tree.set(1, 3)
         tree.set(2, 4)
@@ -175,24 +175,24 @@ class TestSequenceProtocol:
 
     def test_len(self) -> None:
         """Test __len__ method."""
-        tree = SegmentTree(10, 0, operator.add)
+        tree = GenericSegmentTree(10, 0, operator.add)
         assert len(tree) == 10
 
     def test_getitem_positive_index(self) -> None:
         """Test __getitem__ with positive index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(2, 42)
         assert tree[2] == 42
 
     def test_getitem_negative_index(self) -> None:
         """Test __getitem__ with negative index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(-1, 42)
         assert tree[-1] == 42
 
     def test_getitem_slice(self) -> None:
         """Test __getitem__ with slice."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 2, 3, 4, 5]
 
         for i, value in enumerate(values):
@@ -204,24 +204,24 @@ class TestSequenceProtocol:
 
     def test_setitem(self) -> None:
         """Test __setitem__ method."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree[2] = 42
         assert tree[2] == 42
 
     def test_contains_true(self) -> None:
         """Test __contains__ returns True for existing element."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         tree.set(2, 42)
         assert 42 in tree
 
     def test_contains_false(self) -> None:
         """Test __contains__ returns False for non-existing element."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         assert 42 not in tree
 
     def test_iter(self) -> None:
         """Test iteration over segment tree."""
-        tree = SegmentTree(3, 0, operator.add)
+        tree = GenericSegmentTree(3, 0, operator.add)
         values = [10, 20, 30]
 
         for i, value in enumerate(values):
@@ -232,8 +232,8 @@ class TestSequenceProtocol:
 
     def test_equality_true(self) -> None:
         """Test equality comparison returns True for equal sequences."""
-        tree1 = SegmentTree(3, 0, operator.add)
-        tree2 = SegmentTree(3, 0, operator.add)
+        tree1 = GenericSegmentTree(3, 0, operator.add)
+        tree2 = GenericSegmentTree(3, 0, operator.add)
 
         values = [1, 2, 3]
         for i, value in enumerate(values):
@@ -245,14 +245,14 @@ class TestSequenceProtocol:
 
     def test_equality_false_different_length(self) -> None:
         """Test equality comparison returns False for different lengths."""
-        tree1 = SegmentTree(3, 0, operator.add)
-        tree2 = SegmentTree(4, 0, operator.add)
+        tree1 = GenericSegmentTree(3, 0, operator.add)
+        tree2 = GenericSegmentTree(4, 0, operator.add)
         assert tree1 != tree2
 
     def test_equality_false_different_values(self) -> None:
         """Test equality comparison returns False for different values."""
-        tree1 = SegmentTree(2, 0, operator.add)
-        tree2 = SegmentTree(2, 0, operator.add)
+        tree1 = GenericSegmentTree(2, 0, operator.add)
+        tree2 = GenericSegmentTree(2, 0, operator.add)
 
         tree1.set(0, 1)
         tree2.set(0, 2)
@@ -265,23 +265,23 @@ class TestStringRepresentation:
 
     def test_repr(self) -> None:
         """Test __repr__ method."""
-        tree = SegmentTree(3, 0, operator.add)
+        tree = GenericSegmentTree(3, 0, operator.add)
         tree.set(0, 1)
         tree.set(1, 2)
         tree.set(2, 3)
 
         result = repr(tree)
-        assert "SegmentTree([1, 2, 3])" in result
+        assert "GenericSegmentTree([1, 2, 3])" in result
 
     def test_str(self) -> None:
         """Test __str__ method."""
-        tree = SegmentTree(3, 0, operator.add)
+        tree = GenericSegmentTree(3, 0, operator.add)
         tree.set(0, 1)
         tree.set(1, 2)
         tree.set(2, 3)
 
         result = str(tree)
-        assert "SegmentTree([1, 2, 3])" in result
+        assert "GenericSegmentTree([1, 2, 3])" in result
 
 
 class TestComplexOperations:
@@ -289,7 +289,7 @@ class TestComplexOperations:
 
     def test_min_operation(self) -> None:
         """Test segment tree with min operation."""
-        tree = SegmentTree(5, float("inf"), min)
+        tree = GenericSegmentTree(5, float("inf"), min)
         values = [10, 5, 20, 15, 8]
 
         for i, value in enumerate(values):
@@ -301,7 +301,7 @@ class TestComplexOperations:
 
     def test_gcd_operation(self) -> None:
         """Test segment tree with GCD operation."""
-        tree = SegmentTree(4, 0, math.gcd)
+        tree = GenericSegmentTree(4, 0, math.gcd)
         values = [12, 18, 24, 30]
 
         for i, value in enumerate(values):
@@ -312,7 +312,7 @@ class TestComplexOperations:
 
     def test_string_concatenation(self) -> None:
         """Test segment tree with string concatenation."""
-        tree = SegmentTree(3, "", operator.add)
+        tree = GenericSegmentTree(3, "", operator.add)
         tree.set(0, "Hello")
         tree.set(1, " ")
         tree.set(2, "World")
@@ -322,7 +322,7 @@ class TestComplexOperations:
     def test_large_tree_performance(self) -> None:
         """Test operations on larger tree for basic performance validation."""
         size = 1000
-        tree = SegmentTree(size, 0, operator.add)
+        tree = GenericSegmentTree(size, 0, operator.add)
 
         # Set all elements to 1
         for i in range(size):
@@ -338,7 +338,7 @@ class TestEdgeCases:
 
     def test_single_element_tree(self) -> None:
         """Test tree with single element."""
-        tree = SegmentTree(1, 0, operator.add)
+        tree = GenericSegmentTree(1, 0, operator.add)
         tree.set(0, 42)
 
         assert tree.get(0) == 42
@@ -348,7 +348,7 @@ class TestEdgeCases:
 
     def test_power_of_two_size(self) -> None:
         """Test tree with power of two size."""
-        tree = SegmentTree(8, 0, operator.add)
+        tree = GenericSegmentTree(8, 0, operator.add)
 
         for i in range(8):
             tree.set(i, i + 1)
@@ -357,7 +357,7 @@ class TestEdgeCases:
 
     def test_non_power_of_two_size(self) -> None:
         """Test tree with non-power of two size."""
-        tree = SegmentTree(7, 0, operator.add)
+        tree = GenericSegmentTree(7, 0, operator.add)
 
         for i in range(7):
             tree.set(i, i + 1)
@@ -368,7 +368,7 @@ class TestEdgeCases:
         """Test using zero as identity with multiplication (edge case)."""
         # Note: This is mathematically incorrect (should use 1 for multiplication)
         # but tests the implementation behavior
-        tree = SegmentTree(3, 0, operator.mul)
+        tree = GenericSegmentTree(3, 0, operator.mul)
         tree.set(0, 5)
         tree.set(1, 3)
 
@@ -377,7 +377,7 @@ class TestEdgeCases:
 
     def test_update_same_element_multiple_times(self) -> None:
         """Test updating the same element multiple times."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
 
         # Set initial values
         for i in range(5):

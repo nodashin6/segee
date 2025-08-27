@@ -2,20 +2,25 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
-from typing import overload
+from collections.abc import Callable, Iterator, Sequence
+from typing import Generic, TypeVar, overload
 
-from segee._types import BinaryOperation, Predicate, T
 from segee.exceptions import (
     SegmentTreeIndexError,
     SegmentTreeInitializationError,
     SegmentTreeRangeError,
 )
+from segee.shared.backbone.sequence_protocol import SequenceProtocolMixin
 
-__all__ = ["SegmentTree"]
+# Type definitions
+T = TypeVar("T")
+BinaryOperation = Callable[[T, T], T]
+Predicate = Callable[[T], bool]
+
+__all__ = ["GenericSegmentTree"]
 
 
-class SegmentTree[T](Sequence[T]):
+class GenericSegmentTree[T](SequenceProtocolMixin[T]):
     """A high-performance Segment Tree data structure for range queries and updates.
 
     The Segment Tree supports efficient range aggregation queries and point updates
@@ -27,7 +32,7 @@ class SegmentTree[T](Sequence[T]):
 
         >>> def add(a: int, b: int) -> int:
         ...     return a + b
-        >>> tree = SegmentTree(5, 0, add)
+        >>> tree = GenericSegmentTree(5, 0, add)
         >>> tree.set(0, 10)
         >>> tree.set(1, 20)
         >>> tree.prod(0, 2)  # Sum of elements from index 0 to 1
@@ -37,7 +42,7 @@ class SegmentTree[T](Sequence[T]):
 
         >>> def max_op(a: int, b: int) -> int:
         ...     return max(a, b)
-        >>> tree = SegmentTree(3, float('-inf'), max_op)
+        >>> tree = GenericSegmentTree(3, float('-inf'), max_op)
         >>> tree.set(0, 5)
         >>> tree.set(1, 10)
         >>> tree.set(2, 3)
@@ -47,6 +52,8 @@ class SegmentTree[T](Sequence[T]):
     Attributes:
         size: The number of elements the segment tree can hold.
     """
+
+    __slots__ = ("_bit_len", "_data", "_identity", "_offset", "_operation", "_size", "_total_size")
 
     def __init__(
         self,
@@ -94,7 +101,7 @@ class SegmentTree[T](Sequence[T]):
 
     def __hash__(self) -> int:
         """Segment trees are mutable and should not be hashed."""
-        msg = "unhashable type: 'SegmentTree'"
+        msg = "unhashable type: 'GenericSegmentTree'"
         raise TypeError(msg)
 
     @property
@@ -178,7 +185,7 @@ class SegmentTree[T](Sequence[T]):
             O(log n) where n is the size of the segment tree.
 
         Examples:
-            >>> tree = SegmentTree(5, 0, lambda a, b: a + b)
+            >>> tree = GenericSegmentTree(5, 0, lambda a, b: a + b)
             >>> for i in range(5):
             ...     tree.set(i, i + 1)
             >>> tree.prod(1, 4)  # Sum of elements from index 1 to 3
@@ -327,7 +334,7 @@ class SegmentTree[T](Sequence[T]):
         if left < 0 or right > self._size or left > right:
             raise SegmentTreeRangeError(left, right, self._size)
 
-    def _get_range_nodes(self, left: int, right: int) -> list[int]:
+    def _get_range_nodes(self, left: int, right: int) -> Iterator[int]:
         """Get the internal node indices that cover the given range."""
         left_internal = left + self._offset
         right_internal = right + self._offset
@@ -346,8 +353,9 @@ class SegmentTree[T](Sequence[T]):
             left_internal = (left_internal - 1) >> 1
             right_internal = (right_internal - 1) >> 1
 
-        # Combine left and reversed right nodes for proper order
-        return left_nodes + right_nodes[::-1]
+        # Yield left nodes first, then right nodes in reverse order
+        yield from left_nodes
+        yield from reversed(right_nodes)
 
     def _get_parent_index(self, index: int) -> int:
         """Get the parent index of a node."""
@@ -402,12 +410,12 @@ class SegmentTree[T](Sequence[T]):
     def __repr__(self) -> str:
         """Return a string representation of the segment tree."""
         elements = list(self)
-        return f"SegmentTree({elements!r})"
+        return f"GenericSegmentTree({elements!r})"
 
     def __str__(self) -> str:
         """Return a human-readable string representation."""
         elements = list(self)
-        return f"SegmentTree({elements!r})"
+        return f"GenericSegmentTree({elements!r})"
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another sequence."""
@@ -418,3 +426,7 @@ class SegmentTree[T](Sequence[T]):
             return False
 
         return all(a == b for a, b in zip(self, other, strict=True))
+
+
+# Register GenericSegmentTree as a Sequence
+Sequence.register(GenericSegmentTree)
