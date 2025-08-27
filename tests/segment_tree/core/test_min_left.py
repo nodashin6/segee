@@ -7,7 +7,7 @@ import operator
 import pytest
 
 from segee.exceptions import SegmentTreeIndexError
-from segee.segment_tree import SegmentTree
+from segee.segment_tree import GenericSegmentTree
 
 
 class TestSegmentTreeMinLeft:
@@ -15,7 +15,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_sum_predicate(self) -> None:
         """Test min_left with sum predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 2, 3, 4, 5]
 
         for i, value in enumerate(values):
@@ -27,19 +27,19 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_at_boundary(self) -> None:
         """Test min_left at tree boundary."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         result = tree.min_left(0, lambda _: True)
         assert result == 0
 
     def test_min_left_invalid_index(self) -> None:
         """Test min_left with invalid ending index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeIndexError):
             tree.min_left(-1, lambda _: True)
 
     def test_min_left_max_predicate(self) -> None:
         """Test min_left with max predicate."""
-        tree = SegmentTree(5, float("-inf"), max)
+        tree = GenericSegmentTree(5, float("-inf"), max)
         values = [10, 5, 20, 15, 8]
 
         for i, value in enumerate(values):
@@ -55,7 +55,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_no_valid_range(self) -> None:
         """Test min_left when no range satisfies predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 2, 3, 4, 5]
 
         for i, value in enumerate(values):
@@ -67,7 +67,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_all_satisfy_predicate(self) -> None:
         """Test min_left when all ranges satisfy predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 1, 1, 1, 1]
 
         for i, value in enumerate(values):
@@ -79,7 +79,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_min_operation(self) -> None:
         """Test min_left with min operation."""
-        tree = SegmentTree(5, float("inf"), min)
+        tree = GenericSegmentTree(5, float("inf"), min)
         values = [10, 5, 15, 3, 8]
 
         for i, value in enumerate(values):
@@ -91,7 +91,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_from_middle(self) -> None:
         """Test min_left ending at middle of array."""
-        tree = SegmentTree(6, 0, operator.add)
+        tree = GenericSegmentTree(6, 0, operator.add)
         values = [10, 5, 3, 2, 1, 4]
 
         for i, value in enumerate(values):
@@ -103,7 +103,7 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_single_element(self) -> None:
         """Test min_left on single element tree."""
-        tree = SegmentTree(1, 0, operator.add)
+        tree = GenericSegmentTree(1, 0, operator.add)
         tree.set(0, 42)
 
         result = tree.min_left(1, lambda x: x <= 50)
@@ -114,6 +114,6 @@ class TestSegmentTreeMinLeft:
 
     def test_min_left_empty_range(self) -> None:
         """Test min_left with empty range (right=0)."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         result = tree.min_left(0, lambda _: True)
         assert result == 0

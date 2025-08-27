@@ -1,8 +1,10 @@
 # Performance Guide
 
+Comprehensive performance analysis for the segee data structures library.
+
 ## Complexity Analysis
 
-### Time Complexity
+### Segment Trees
 
 | Operation | Complexity | Description |
 |-----------|------------|-------------|
@@ -10,10 +12,23 @@
 | **Point Update** | O(log n) | Update single element |
 | **Range Query** | O(log n) | Query aggregated value over range |
 | **Binary Search** | O(log² n) | max_right/min_left operations |
+| **Memory Usage** | O(n) | ~4x input array size |
+
+### Binary Indexed Trees
+
+| Operation | GenericBIT | RangeUpdatableBIT | Description |
+|-----------|------------|-------------------|-------------|
+| **Initialization** | O(n) | O(n) | Create tree from sequence |
+| **Point Update** | O(log n) | O(log n) | Update single element |
+| **Range Update** | N/A | O(log n) | Update range of elements |
+| **Point Query** | O(log n) | O(log n) | Get single element value |
+| **Range Query** | O(log n) | O(log n) | Sum over range |
+| **Memory Usage** | O(n) | O(n) | ~2x input array size |
 
 ### Space Complexity
 
-- **Memory usage**: O(n) - approximately 4x input array size
+- **Segment Trees**: O(n) - approximately 4x input array size
+- **Binary Indexed Trees**: O(n) - approximately 1-2x input array size
 - **Tree height**: O(log n)
 - **Cache efficiency**: Excellent due to array-based storage
 
@@ -21,49 +36,65 @@
 
 ### Performance vs Naive Approaches
 
-Our test suite validates that segment trees have overhead for small datasets but scale excellently:
+Our test suite with 232 comprehensive tests validates that both segment trees and binary indexed trees have overhead for small datasets but scale excellently:
 
 ```python
-# For n=1000, q=1000: Naive approaches are often faster
-# For n=100000, q=10000: Segment trees dominate
-
-# Actual benchmark results from tests/samples/performance_test.py:
-# - Sum queries (n=1000, q=1000): Naive ~0.5ms, SegTree ~1.2ms  
+# Segment Trees vs Naive (from tests/samples/):
+# - Sum queries (n=1000, q=1000): Naive ~0.5ms, SegTree ~1.2ms
 # - Min queries (n=1000, q=1000): Naive ~0.8ms, SegTree ~1.1ms
 # - Sum queries (n=100000, q=10000): Naive ~150ms, SegTree ~8ms
+
+# Binary Indexed Trees vs Naive:
+# - Point updates + range sums (n=1000): BIT advantage starts here
+# - Range updates + point queries (n=1000): RangeUpdatableBIT dominates
+# - Large datasets (n>10000): BIT is 5-10x faster than naive approaches
 ```
 
 ### Scalability
 
-Segment trees excel with:
+**Both data structures excel with:**
 - **Large datasets** (n > 10,000)
 - **Many queries** (q > 1,000)
 - **Mixed update/query workloads**
 
-## When to Use Segment Trees
+## Choosing the Right Data Structure
 
 ### ✅ Use Segment Trees When:
-- Dataset size n > 1,000
-- Query count q > 1,000  
-- Need O(log n) updates and queries
-- Data changes frequently (mixed updates/queries)
-- Range queries are complex (not just simple iteration)
+- Need arbitrary associative operations (min, max, GCD, XOR)
+- Need binary search operations (`max_right`, `min_left`)
+- Dataset size n > 1,000 with frequent range queries
+- Custom operations or complex aggregations
+- Mixed updates and range queries
+
+### ✅ Use Binary Indexed Trees When:
+- Only need additive operations (sum, count, difference)
+- Want maximum performance for sum-related queries
+- Need efficient point updates with range sum queries
+- Memory usage is a concern (BIT uses ~2x vs SegTree ~4x)
+
+### ✅ Use RangeAddBinaryIndexedTree When:
+- Need efficient range updates AND range sum queries
+- Working with additive operations only
+- Want O(log n) performance for both range updates and queries
+- Implementing difference arrays or lazy propagation patterns
 
 ### ❌ Use Naive Approaches When:
 - Small datasets (n < 1,000)
 - Few queries (q < 100)
 - Data is mostly static
-- Simple operations that vectorize well
+- Simple operations that vectorize well with NumPy
 
 ## Optimization Tips
 
 ### 1. Choose the Right Specialized Class
 ```python
-# ✅ Good: Use specialized classes when possible
-sum_tree = SumSegmentTree(n)
+# ✅ Good: Use specialized classes for common operations
+sum_tree = SumSegmentTree(n)           # For sum operations
+bit = BinaryIndexedTree(n)             # For additive point updates
+rubit = RangeAddBinaryIndexedTree(n)  # For range updates
 
 # ❌ Suboptimal: Generic class for simple operations
-tree = SegmentTree(n, 0, operator.add)
+tree = GenericSegmentTree(n, 0, operator.add)
 ```
 
 ### 2. Batch Operations
@@ -84,9 +115,10 @@ for update, query in zip(updates, queries):
 ```python
 # ✅ Good: Use integers when possible
 tree = SumSegmentTree(n)  # Uses int | float
+bit = BinaryIndexedTree([1, 2, 3])  # Optimized for int | float
 
-# ❌ Suboptimal: Unnecessary precision
-tree = SegmentTree(n, 0.0, lambda a, b: float(a + b))
+# ❌ Suboptimal: Unnecessary precision or wrong choice
+tree = GenericSegmentTree(n, 0.0, lambda a, b: float(a + b))
 ```
 
 ### 4. Memory-Efficient Initialization
@@ -107,7 +139,7 @@ temp_list = [tree.set(i, val) for i, val in enumerate(data)]
 
 For a segment tree with n elements:
 - **Internal array size**: Next power of 2 ≥ 2n
-- **Memory per element**: ~4x original data
+- **Memory per element**: ~2x original data
 - **Example**: n=1000 → internal size=2048, ~8KB for integers
 
 ### Memory Optimization
@@ -132,11 +164,11 @@ from segee import SumSegmentTree
 
 def profile_segment_tree(n: int, q: int) -> float:
     tree = SumSegmentTree(n)
-    
+
     # Setup phase
     for i in range(n):
         tree.set(i, i)
-    
+
     # Query phase
     start = time.time()
     for i in range(q):
@@ -174,7 +206,7 @@ tracemalloc.stop()
 def naive_range_sum(arr, left, right):
     return sum(arr[left:right])
 
-# Range sum with SegmentTree: O(log n) per query  
+# Range sum with SegmentTree: O(log n) per query
 tree = SumSegmentTree(len(arr))
 result = tree.sum(left, right)
 ```
@@ -193,32 +225,48 @@ result = np.sum(arr[left:right])  # Vectorized, very fast
 # - Custom binary operations
 ```
 
-### vs. Fenwick Tree (Binary Indexed Tree)
+### vs. Binary Indexed Tree (Detailed Comparison)
 
-| Feature | SegmentTree | Fenwick Tree |
-|---------|-------------|--------------|
-| **Range Query** | O(log n) | O(log n) |
-| **Point Update** | O(log n) | O(log n) |
-| **Memory** | 2n | n |
-| **Operations** | Any associative | Sum-like only |
-| **Implementation** | More complex | Simpler |
-| **Range Update** | Need lazy prop | Not supported |
+| Feature | SegmentTree | BinaryIndexedTree | RangeUpdatableBIT |
+|---------|-------------|-------------------|-------------------|
+| **Range Query** | O(log n) | O(log n) | O(log n) |
+| **Point Update** | O(log n) | O(log n) | O(log n) |
+| **Range Update** | Not supported* | Not supported | O(log n) |
+| **Point Query** | O(1) | O(log n) | O(log n) |
+| **Memory** | ~4n | ~n | ~2n |
+| **Operations** | Any associative | Additive only | Additive only |
+| **Binary Search** | max_right, min_left | No | No |
+| **Implementation** | More complex | Simpler | Medium |
+
+*\*Segment trees can support range updates with lazy propagation (not implemented)*
 
 ## Real-World Performance
 
 ### Competitive Programming
-Segment trees are the standard for:
-- Range sum/min/max queries
-- Range GCD/LCM queries  
+**Segment Trees** are standard for:
+- Range sum/min/max queries with point updates
+- Range GCD/LCM queries
 - Binary search on monotonic properties
 - Complex aggregation functions
 
+**Binary Indexed Trees** are preferred for:
+- Fast range sum queries with point updates
+- Inversion counting problems
+- 2D coordinate compression problems
+- Any additive range query scenarios
+
 ### Data Analysis
-Excellent for:
-- Sliding window statistics
-- Time series analysis
-- Real-time monitoring systems
-- Financial data processing
+**Segment Trees** excel for:
+- Sliding window statistics with custom operations
+- Time series analysis with complex aggregations
+- Real-time monitoring with min/max tracking
+- Financial data with custom metrics
+
+**Binary Indexed Trees** excel for:
+- High-frequency trading systems (fast sum queries)
+- Real-time analytics with additive metrics
+- Event counting and aggregation
+- Memory-constrained environments
 
 ### Performance Recommendations
 

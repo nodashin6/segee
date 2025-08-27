@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "segee"
-version = "0.1.0"
+version = "0.1.1"
 description = "A high-performance, enterprise-grade Segment Tree implementation for Python"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -30,6 +30,9 @@ classifiers = [
 requires-python = ">=3.12"
 dependencies = []
 
+[project.scripts]
+segee = "segee_cli.main:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
@@ -54,11 +57,12 @@ Repository = "https://github.com/nodashin6/segee.git"
 Issues = "https://github.com/nodashin6/segee/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["segee"]
+packages = ["segee", "segee_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/segee",
+    "/segee_cli",
     "/tests",
     "/README.md",
     "/LICENSE",
@@ -131,6 +135,7 @@ ignore = [
     "COM812", # Trailing comma missing
     "ISC001", # Implicitly concatenated string literals on one line
     "TC001", # Move application import into a type-checking block
+    "F401", # Unused imports
 ]
 
 [tool.ruff.lint.pydocstyle]

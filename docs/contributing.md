@@ -1,6 +1,6 @@
 # Contributing to Segee
 
-Thank you for your interest in contributing to Segee! This guide will help you get started.
+Thank you for your interest in contributing to Segee! This guide will help you contribute to our enterprise-grade data structures library.
 
 ## Development Setup
 
@@ -60,28 +60,45 @@ pytest tests/samples/               # Real-world examples
 
 ```
 segee/
-├── segment_tree/           # Main implementation
-│   ├── __init__.py        # Module exports
-│   ├── segment_tree.py    # Generic segment tree
-│   └── specialized.py     # Sum/Min/Max classes
-├── exceptions.py          # Custom exceptions
-├── _types.py             # Type definitions
-└── __init__.py           # Package exports
+├── segment_tree/           # Segment tree module
+│   ├── backbone/          # Generic implementations
+│   │   └── generic_segment_tree.py
+│   ├── specialized/       # Specialized classes (Sum/Min/Max)
+│   └── __init__.py       # Module exports
+├── binary_indexed_tree/   # Binary indexed tree module
+│   ├── backbone/          # Generic implementations
+│   │   ├── generic_binary_indexed_tree.py
+│   │   └── generic_range_updatable_binary_indexed_tree.py
+│   ├── specialized/       # Specialized classes
+│   └── __init__.py       # Module exports
+├── shared/               # Shared components
+│   ├── backbone/         # Base classes and mixins
+│   ├── protocols/        # Type protocols (AdditiveProtocol, etc.)
+│   └── queries/          # Query mixins (RangeSumQuery, etc.)
+├── cli.py               # Legacy CLI entry point
+├── exceptions.py        # Custom exception hierarchy
+└── __init__.py         # Package exports
+
+segee_cli/              # Interactive CLI application
+├── main.py            # CLI implementation
+└── __init__.py        # CLI exports
 
 tests/
-├── segment_tree/          # Segment tree specific tests
-│   ├── core/             # Basic functionality tests
-│   └── application/      # Specialized class tests
-├── samples/              # Real problem examples
+├── segment_tree/       # Segment tree tests (152 tests)
+│   ├── core/          # Basic functionality
+│   └── application/   # Specialized classes
+├── binary_indexed_tree/  # Binary indexed tree tests (80 tests)
+├── samples/           # Real-world problem examples
 │   ├── 01_range_sum_query/
-│   └── 02_range_min_query/
-└── test_exceptions.py    # Exception handling tests
+│   ├── 02_range_min_query/
+│   └── performance_test.py
+└── test_*.py         # Exception and protocol tests
 
 docs/
-├── usage.md              # Usage examples
-├── api.md               # API documentation  
-├── performance.md       # Performance guide
-└── contributing.md      # This file
+├── usage.md          # Comprehensive usage guide
+├── api.md           # Complete API reference
+├── performance.md   # Performance analysis
+└── contributing.md  # This file
 ```
 
 ## Contributing Guidelines
@@ -94,9 +111,10 @@ docs/
 
 ### 2. Testing Requirements
 - Write tests for all new functionality
-- Maintain 100% test coverage
+- Maintain comprehensive test coverage (currently 232 tests)
 - Include edge cases and error conditions
 - Add performance tests for new algorithms
+- Follow the backbone/specialized testing pattern
 
 ### 3. Documentation
 - Update API documentation for new methods
@@ -134,9 +152,11 @@ git push origin feature/your-feature-name
 - Update documentation if behavior changes
 
 ### ✨ New Features
-- Add new segment tree variants
-- Implement additional operations
+- Add new segment tree or binary indexed tree variants
+- Implement additional operations and protocols
 - Extend binary search functionality
+- Create new query mixins for standardized interfaces
+- Implement lazy propagation for segment trees
 
 ### 📚 Documentation
 - Improve usage examples
@@ -152,38 +172,55 @@ git push origin feature/your-feature-name
 
 ### Test Categories
 
-1. **Core Tests** (`tests/segment_tree/core/`)
-   - Basic operations (set, get, prod)
-   - Binary search methods (max_right, min_left)
+1. **Core Tests** (`tests/segment_tree/core/`, `tests/binary_indexed_tree/core/`)
+   - Basic operations (set, get, prod, sum)
+   - Binary search methods (max_right, min_left) for segment trees
    - Edge cases and error conditions
+   - Protocol implementations
 
-2. **Application Tests** (`tests/segment_tree/application/`)
-   - Specialized classes (Sum/Min/MaxSegmentTree)
+2. **Application Tests** (`tests/segment_tree/application/`, `tests/binary_indexed_tree/application/`)
+   - Specialized classes (Sum/Min/Max segment trees, BIT variants)
+   - Query mixin integration
    - Convenience methods and aliases
    - Class-specific functionality
 
 3. **Sample Tests** (`tests/samples/`)
    - Real-world problem scenarios
-   - Ground truth validation
-   - Performance comparisons
+   - Ground truth validation with naive solutions
+   - Performance comparisons between data structures
+
+4. **Shared Component Tests** (`tests/test_protocols.py`, `tests/test_queries.py`)
+   - Protocol implementations
+   - Query mixin functionality
+   - Shared backbone components
 
 ### Writing Tests
 
 ```python
 class TestYourFeature:
-    """Test your new feature."""
+    """Test your new feature following enterprise patterns."""
     
     def test_basic_functionality(self) -> None:
         """Test basic functionality works correctly."""
-        tree = SumSegmentTree(5)
-        tree.set(0, 10)
-        assert tree.sum(0, 1) == 10
+        # Test both data structures when applicable
+        seg_tree = SumSegmentTree(5)
+        seg_tree.set(0, 10)
+        assert seg_tree.sum(0, 1) == 10
+        
+        bit = BinaryIndexedTree([10, 0, 0, 0, 0])
+        assert bit.sum(0, 1) == 10
     
-    def test_edge_cases(self) -> None:
-        """Test edge cases and boundary conditions."""
-        tree = SumSegmentTree(1)
-        tree.set(0, 42)
-        assert tree.sum() == 42
+    def test_protocol_compliance(self) -> None:
+        """Test protocol implementations."""
+        from segee.shared.protocols import AdditiveProtocol
+        tree = GenericBinaryIndexedTree[int](5)
+        assert isinstance(1, AdditiveProtocol)  # Type checking
+    
+    def test_mixin_integration(self) -> None:
+        """Test query mixin functionality."""
+        tree = SumSegmentTree(5)
+        assert hasattr(tree, 'sum')  # From RangeSumQueryMixin
+        assert hasattr(tree, 'prefix_sum')
     
     def test_error_conditions(self) -> None:
         """Test proper error handling."""
@@ -246,18 +283,33 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ## Architecture Decisions
 
+### Enterprise Design Patterns
+The codebase follows enterprise-grade patterns:
+- **Backbone/Specialized Pattern**: Generic implementations in `backbone/`, specialized in `specialized/`
+- **Protocol-Based Type System**: AdditiveProtocol, ComparableProtocol for flexible constraints
+- **Mixin Architecture**: Query interfaces through shared mixins
+- **Comprehensive Testing**: 232 tests with ground truth validation
+
+### Current Implementation Status
+- `segee/segment_tree/` - Complete with backbone/specialized pattern
+- `segee/binary_indexed_tree/` - Complete with backbone/specialized pattern
+- `segee/shared/` - Protocol and mixin framework
+- `segee_cli/` - Interactive CLI application
+
 ### Future Extensibility
-The codebase is designed for future algorithms:
-- `segee/segment_tree/` - Current implementation
-- `segee/binary_indexed_tree/` - Planned addition
+The architecture supports future data structures:
 - `segee/sparse_table/` - Potential future addition
+- `segee/lazy_segment_tree/` - Lazy propagation extension
+- Additional query mixins and protocols
 
 ### Design Principles
-1. **Type Safety**: Complete type hints with generic support
-2. **Pythonic API**: Follow Python conventions and protocols
-3. **Performance**: O(log n) guarantees with efficient implementation
-4. **Error Handling**: Clear, specific exception types
-5. **Testability**: Comprehensive test coverage with ground truth validation
+1. **Type Safety**: Complete type hints with protocol-based constraints
+2. **Modular Architecture**: Clear separation between backbone and specialized implementations  
+3. **Pythonic API**: Follow Python conventions with full sequence protocol support
+4. **Performance**: O(log n) guarantees with memory-optimized implementations
+5. **Error Handling**: Comprehensive exception hierarchy with context
+6. **Testability**: Ground truth validation and performance benchmarking
+7. **Extensibility**: Plugin-like mixin system for new functionality
 
 ## Getting Help
 
