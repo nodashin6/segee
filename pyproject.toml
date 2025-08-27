@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "segee"
-version = "0.1.1"
+version = "0.2.0"
 description = "A high-performance, enterprise-grade Segment Tree implementation for Python"
 readme = "README.md"
 license = {file = "LICENSE"}
