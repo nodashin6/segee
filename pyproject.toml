@@ -135,6 +135,7 @@ ignore = [
     "COM812", # Trailing comma missing
     "ISC001", # Implicitly concatenated string literals on one line
     "TC001", # Move application import into a type-checking block
+    "F401", # Unused imports
 ]
 
 [tool.ruff.lint.pydocstyle]

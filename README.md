@@ -3,38 +3,41 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-
-Lightning-fast range queries with O(log n) performance and modern Python design.
+Python data structures library for efficient range queries and updates.
 
 
 ## ✨ Features
 
-🚀 **High Performance** - O(log n) range queries and updates  
-🔒 **Type Safe** - Complete generic type hints for Python 3.12+  
-🏢 **Enterprise Ready** - Comprehensive error handling and validation  
-🧪 **Battle Tested** - 152 unit tests with ground truth validation  
-🐍 **Pythonic** - Full sequence protocol support (`tree[i]`, `len(tree)`, etc.)  
-⚡ **Zero Dependencies** - Pure Python with no external requirements  
+- **Segment Trees**: Range queries with any associative operation (sum, min, max, GCD, etc.)
+- **Binary Indexed Trees**: Efficient sum queries and updates for additive operations
+- **Type Safety**: Generic type hints with protocol-based constraints
+- **Pure Python**: Zero dependencies, works with Python 3.12+
+- **Comprehensive Testing**: 232 tests including real-world problem validation
+- **Pythonic API**: Full sequence protocol support (`tree[i]`, `len(tree)`, etc.)
 
 ## 🚀 Quick Start
 
 ```python
-from segee import SumSegmentTree, MinSegmentTree, MaxSegmentTree
+from segee import SumSegmentTree, MinSegmentTree, BinaryIndexedTree
 
-# Sum queries - perfect for range sum problems
-sum_tree = SumSegmentTree(1000)
-sum_tree[100] = 42
-sum_tree[200] = 58
-print(sum_tree.sum(100, 201))  # 100
+# Segment Trees - for any associative operation
+sum_tree = SumSegmentTree(5)
+sum_tree[0:5] = [1, 2, 3, 4, 5]
+print(sum_tree.sum(1, 4))     # 9 (sum of indices 1-3)
 
-# Min/Max queries - ideal for range minimum/maximum problems  
-min_tree = MinSegmentTree(1000)
-min_tree[50:55] = [10, 5, 20, 15, 8]
-print(min_tree.minimum(50, 55))  # 5
+min_tree = MinSegmentTree(5)
+min_tree[0:5] = [10, 5, 20, 15, 8]
+print(min_tree.minimum(1, 4))  # 5 (min of indices 1-3)
 
-# Custom operations - build your own segment tree
-import operator, math
-gcd_tree = SegmentTree(100, 0, math.gcd)
+# Binary Indexed Trees - optimized for additive operations
+bit = BinaryIndexedTree([1, 2, 3, 4, 5])
+bit.add(2, 10)  # Add 10 to index 2
+print(bit.sum(0, 5))  # 25 (sum of all elements)
+
+# Custom operations with generic segment tree
+import math
+from segee import GenericSegmentTree
+gcd_tree = GenericSegmentTree(5, 0, math.gcd)
 ```
 
 ## 📦 Installation
@@ -43,37 +46,53 @@ gcd_tree = SegmentTree(100, 0, math.gcd)
 pip install segee
 ```
 
-## 🏗️ Architecture
+## 🏗️ Available Data Structures
+
+### Segment Trees
+- `GenericSegmentTree[T]` - Generic implementation for any associative operation
+- `SumSegmentTree` - Optimized for sum operations
+- `MinSegmentTree` - Optimized for minimum operations
+- `MaxSegmentTree` - Optimized for maximum operations
+
+### Binary Indexed Trees
+- `GenericBinaryIndexedTree[T]` - Generic implementation for additive operations
+- `BinaryIndexedTree` - Optimized for int/float types
+- `RangeAddBinaryIndexedTree` - Supports efficient range updates
+
+### 🎯 Interactive CLI
+```bash
+# Launch interactive segment tree CLI
+segee
+```
+
+## 🏛️ Architecture
 
 ```
 segee/
-├── segment_tree/           # Segment tree implementations
-│   ├── segment_tree.py    # Generic segment tree core
-│   └── specialized.py     # Sum/Min/Max convenience classes
-├── exceptions.py          # Custom exception hierarchy  
-└── _types.py             # Type definitions and protocols
+├── segment_tree/           # Segment tree module
+│   ├── backbone/          # Generic implementations
+│   └── specialized/       # Sum/Min/Max classes
+├── binary_indexed_tree/   # Binary indexed tree module
+│   ├── backbone/          # Generic implementations
+│   └── specialized/       # Optimized classes
+├── shared/               # Shared protocols and mixins
+└── segee_cli/           # Interactive CLI application
 ```
 
 
 ## 📚 Documentation
 
-- **[Usage Guide](docs/usage.md)** - Comprehensive examples and patterns
-- **[API Reference](docs/api.md)** - Complete method documentation  
-- **[Performance](docs/performance.md)** - Benchmarks and complexity analysis
-- **[Contributing](docs/contributing.md)** - Development setup and guidelines
+- [Usage Guide](docs/usage.md) - Examples and usage patterns
+- [API Reference](docs/api.md) - Complete method documentation
+- [Performance Guide](docs/performance.md) - Complexity analysis and benchmarks
+- [Contributing](docs/contributing.md) - Development guidelines
 
 
+## 🤔 When to Use
+
+- **Segment Trees**: When you need range queries with custom operations (min, max, GCD, XOR, etc.)
+- **Binary Indexed Trees**: When you need fast sum queries and updates, or range sum with range updates
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-
-**Built with ❤️ for the Python community**
-
-[🐛 Report Bug](https://github.com/nodashin/segee/issues) • [✨ Request Feature](https://github.com/nodashin/segee/issues) • [📖 Documentation](docs/)
-
-</div>

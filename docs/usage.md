@@ -4,7 +4,7 @@
 
 ### Specialized Classes (Recommended)
 
-Segee provides three convenience classes for common operations:
+Segee provides optimized specialized classes for common operations with `int | float` types:
 
 #### SumSegmentTree
 ```python
@@ -64,30 +64,97 @@ print(tree.maximum(0, 3))   # 25 (max of indices 0-2)
 print(tree.global_max())    # 25 (maximum of all elements)
 ```
 
-### Generic SegmentTree
+### Generic Segment Trees
 
-For custom operations, use the generic `SegmentTree` class:
+For custom operations or other types, use the generic `GenericSegmentTree` class:
 
 ```python
 import operator
 import math
-from segee import SegmentTree
+from segee import GenericSegmentTree
 
 # Sum segment tree
-sum_tree = SegmentTree(size=5, identity=0, operation=operator.add)
+sum_tree = GenericSegmentTree(size=5, identity=0, operation=operator.add)
 
 # Min segment tree
-min_tree = SegmentTree(size=5, identity=float('inf'), operation=min)
+min_tree = GenericSegmentTree(size=5, identity=float('inf'), operation=min)
 
-# Max segment tree  
-max_tree = SegmentTree(size=5, identity=float('-inf'), operation=max)
+# Max segment tree
+max_tree = GenericSegmentTree(size=5, identity=float('-inf'), operation=max)
 
 # GCD segment tree
-gcd_tree = SegmentTree(size=5, identity=0, operation=math.gcd)
+gcd_tree = GenericSegmentTree(size=5, identity=0, operation=math.gcd)
 
 # String concatenation
-concat_tree = SegmentTree(size=3, identity="", operation=operator.add)
+concat_tree = GenericSegmentTree(size=3, identity="", operation=operator.add)
+
+# Custom type with protocol constraints
+from decimal import Decimal
+decimal_tree = GenericSegmentTree[Decimal](size=5, identity=Decimal('0'), operation=operator.add)
 ```
+
+## Binary Indexed Trees
+
+For additive operations with efficient point updates and range sum queries:
+
+### BinaryIndexedTree (Point Updates)
+
+```python
+from segee import BinaryIndexedTree
+
+# Create from sequence
+bit = BinaryIndexedTree([1, 2, 3, 4, 5])
+
+# Point updates
+bit.add(2, 10)  # Add 10 to index 2
+bit.set(1, 25)  # Set index 1 to 25
+
+# Range sum queries
+print(bit.sum(0, 3))     # Sum of indices [0, 1, 2)
+print(bit.prefix_sum(3)) # Sum of indices [0, 1, 2]
+print(bit.total())       # Sum of all elements
+
+# Individual element access
+print(bit[2])            # Get element at index 2
+bit[3] = 100            # Set element at index 3
+```
+
+### RangeAddBinaryIndexedTree (Range Updates)
+
+```python
+from segee import RangeAddBinaryIndexedTree
+
+# Create from sequence
+rubit = RangeAddBinaryIndexedTree([1, 2, 3, 4, 5])
+
+# Range updates - O(log n)
+rubit.add(1, 4, value=10)  # Add 10 to range [1, 4)
+
+# Point queries
+print(rubit[0])           # 1 (unchanged)
+print(rubit[1])           # 12 (2 + 10)
+print(rubit[2])           # 13 (3 + 10)
+
+# Range sum queries - O(log n)
+print(rubit.sum(0, 5))    # Sum of all elements
+print(rubit.sum(1, 4))    # Sum of range [1, 4)
+```
+
+### Generic Binary Indexed Trees
+
+For custom additive types:
+
+```python
+from segee import GenericBinaryIndexedTree, GenericRangeAddBinaryIndexedTree
+from decimal import Decimal
+
+# Generic BIT with Decimal
+gbit = GenericBinaryIndexedTree([Decimal('1.5'), Decimal('2.5')])
+gbit.add(0, Decimal('10.0'))
+
+# Generic Range Updatable BIT
+grubit = GenericRangeAddBinaryIndexedTree(5)
+grubit.add(0, 3, value=Decimal('5.5'))
 
 ## Advanced Features
 
@@ -105,7 +172,7 @@ result = tree.max_right(0, lambda x: x <= 6)
 print(result)  # 3 (sum([1, 2, 3]) = 6 <= 6)
 ```
 
-#### min_left  
+#### min_left
 Find the minimum left boundary where a predicate holds:
 
 ```python
@@ -184,7 +251,7 @@ except SegmentTreeRangeError as e:
 
 Segment trees are optimal when:
 - **Large datasets** (n > 1000)
-- **Many queries** (q > 1000) 
+- **Many queries** (q > 1000)
 - **Mixed updates and queries**
 
 For small datasets (n < 1000, q < 1000), naive O(n) approaches may be faster due to constant factor overhead.
@@ -250,22 +317,57 @@ for i, value in enumerate(data):
     min_tree.set(i, value)
 ```
 
-## Type Hints
+## Protocol-Based Type System
 
-Segee provides complete type hints for all operations:
+Segee uses protocol-based typing for flexible type constraints:
+
+### AdditiveProtocol
+
+Types supporting addition and subtraction operations:
 
 ```python
-from typing import Protocol
-from segee import SegmentTree, BinaryOperation, Predicate
+from segee import GenericBinaryIndexedTree, AdditiveProtocol
+from decimal import Decimal
+
+# Any type implementing + and - works
+bit_int = GenericBinaryIndexedTree[int]([1, 2, 3])
+bit_float = GenericBinaryIndexedTree[float]([1.5, 2.5, 3.5])
+bit_decimal = GenericBinaryIndexedTree[Decimal]([Decimal('1'), Decimal('2')])
+```
+
+### ComparableProtocol
+
+Types supporting comparison operations:
+
+```python
+from segee import GenericSegmentTree, ComparableProtocol
+from datetime import datetime
+
+# Works with any comparable type
+min_tree = GenericSegmentTree[datetime](
+    size=3,
+    identity=datetime.max,
+    operation=min
+)
+```
+
+### Type Hints
+
+Complete type safety with modern Python type hints:
+
+```python
+from typing import Callable
+from segee import GenericSegmentTree
 
 # Custom operation type
-def custom_op(a: int, b: int) -> int:
-    return a ^ b  # XOR operation
+BinaryOp = Callable[[int, int], int]
+custom_op: BinaryOp = lambda a, b: a ^ b  # XOR operation
 
 # Create typed segment tree
-tree: SegmentTree[int] = SegmentTree(5, 0, custom_op)
+tree: GenericSegmentTree[int] = GenericSegmentTree(5, 0, custom_op)
 
 # Predicate for binary search
+from segee.segment_tree.backbone.generic_segment_tree import Predicate
 predicate: Predicate[int] = lambda x: x < 100
 result: int = tree.max_right(0, predicate)
 ```
@@ -301,17 +403,23 @@ range_sum = tree.sum(0, 3)  # Sum of first 3 values
 
 ### Competitive Programming Template
 ```python
-from segee import SumSegmentTree, MinSegmentTree
+from segee import SumSegmentTree, MinSegmentTree, BinaryIndexedTree
 
 def solve():
     n, q = map(int, input().split())
     arr = list(map(int, input().split()))
-    
-    # Initialize segment tree
-    tree = SumSegmentTree(n)
-    for i, val in enumerate(arr):
-        tree.set(i, val)
-    
+
+    # Initialize data structure based on problem requirements
+    if need_range_updates:
+        from segee import RangeAddBinaryIndexedTree
+        tree = RangeAddBinaryIndexedTree(arr)
+    elif need_only_sum:
+        tree = BinaryIndexedTree(arr)  # Faster for sum-only operations
+    else:
+        tree = SumSegmentTree(n)
+        for i, val in enumerate(arr):
+            tree.set(i, val)
+
     # Process queries
     for _ in range(q):
         query_type, *args = map(int, input().split())
@@ -323,3 +431,33 @@ def solve():
 if __name__ == "__main__":
     solve()
 ```
+
+## Choosing the Right Data Structure
+
+### Segment Tree vs Binary Indexed Tree
+
+**Use Segment Tree when:**
+- Need arbitrary associative operations (min, max, GCD, etc.)
+- Need binary search operations (`max_right`, `min_left`)
+- Need custom operations or complex queries
+
+**Use Binary Indexed Tree when:**
+- Only need additive operations (sum, count, etc.)
+- Want maximum performance for sum queries
+- Need efficient point updates with range sum queries
+
+**Use RangeAddBinaryIndexedTree when:**
+- Need efficient range updates AND range sum queries
+- Working with additive operations only
+- Want O(log n) performance for both updates and queries
+
+### Performance Comparison
+
+| Operation | SegmentTree | BinaryIndexedTree | RangeUpdatableBIT |
+|-----------|-------------|-------------------|-------------------|
+| Point Update | O(log n) | O(log n) | O(log n) |
+| Range Update | Not supported | Not supported | O(log n) |
+| Point Query | O(1) | O(log n) | O(log n) |
+| Range Query | O(log n) | O(log n) | O(log n) |
+| Memory | ~2n | ~n | ~2n |
+| Operations | Any associative | Additive only | Additive only |

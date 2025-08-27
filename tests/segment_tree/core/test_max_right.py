@@ -7,7 +7,7 @@ import operator
 import pytest
 
 from segee.exceptions import SegmentTreeIndexError
-from segee.segment_tree import SegmentTree
+from segee.segment_tree import GenericSegmentTree
 
 
 class TestSegmentTreeMaxRight:
@@ -15,7 +15,7 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_sum_predicate(self) -> None:
         """Test max_right with sum predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 2, 3, 4, 5]
 
         for i, value in enumerate(values):
@@ -27,19 +27,19 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_at_boundary(self) -> None:
         """Test max_right at tree boundary."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         result = tree.max_right(5, lambda _: True)
         assert result == 5
 
     def test_max_right_invalid_index(self) -> None:
         """Test max_right with invalid starting index."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         with pytest.raises(SegmentTreeIndexError):
             tree.max_right(6, lambda _: True)
 
     def test_max_right_no_valid_range(self) -> None:
         """Test max_right when no range satisfies predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [10, 20, 30, 40, 50]
 
         for i, value in enumerate(values):
@@ -51,7 +51,7 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_all_satisfy_predicate(self) -> None:
         """Test max_right when all ranges satisfy predicate."""
-        tree = SegmentTree(5, 0, operator.add)
+        tree = GenericSegmentTree(5, 0, operator.add)
         values = [1, 1, 1, 1, 1]
 
         for i, value in enumerate(values):
@@ -63,7 +63,7 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_max_operation(self) -> None:
         """Test max_right with max operation."""
-        tree = SegmentTree(5, float("-inf"), max)
+        tree = GenericSegmentTree(5, float("-inf"), max)
         values = [5, 10, 3, 8, 15]
 
         for i, value in enumerate(values):
@@ -75,7 +75,7 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_from_middle(self) -> None:
         """Test max_right starting from middle of array."""
-        tree = SegmentTree(6, 0, operator.add)
+        tree = GenericSegmentTree(6, 0, operator.add)
         values = [1, 2, 3, 4, 5, 6]
 
         for i, value in enumerate(values):
@@ -87,7 +87,7 @@ class TestSegmentTreeMaxRight:
 
     def test_max_right_single_element(self) -> None:
         """Test max_right on single element tree."""
-        tree = SegmentTree(1, 0, operator.add)
+        tree = GenericSegmentTree(1, 0, operator.add)
         tree.set(0, 42)
 
         result = tree.max_right(0, lambda x: x <= 50)
